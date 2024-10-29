@@ -1,4 +1,5 @@
 import sys
+import os
 
 class Node():
     def __init__(self, state, parent, action):
@@ -226,4 +227,10 @@ m.solve()
 print("States Explored:", m.num_explored)
 print("Solution:")
 m.print()
-m.output_image("maze.png", show_explored=True)
+# m.output_image("solved_maze/maze.png", show_explored=True)
+
+output_folder = "solved_maze"
+os.makedirs(output_folder, exist_ok=True)
+
+maze_name = os.path.splitext(os.path.basename(sys.argv[1]))[0]
+m.output_image(f"{output_folder}/{maze_name}.png", show_explored=True)
