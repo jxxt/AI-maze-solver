@@ -279,12 +279,18 @@ class MazeSolverApp:
             if solver_class:
                 solver = solver_class("generated_maze/m.txt")
                 solver.solve()
-                solver.output_image(
-                    f"generated_maze/{left_algo.lower()}_solution.png")
+                # Ensure valid filename and directory existence
+                if left_algo == "A*":
+                    left_filename = f"generated_maze/a_star_solution.png"
+                else:
+                    left_filename = f"generated_maze/{left_algo.lower()}_solution.png"
+                directory = os.path.dirname(left_filename)
+                if directory and not os.path.exists(directory):
+                    os.makedirs(directory)
+                solver.output_image(left_filename)
 
                 # Display solution image
-                left_image = Image.open(
-                    f"generated_maze/{left_algo.lower()}_solution.png")
+                left_image = Image.open(left_filename)
                 left_photo = ImageTk.PhotoImage(left_image)
                 self.left_solution_label.config(image=left_photo)
                 self.left_solution_label.image = left_photo
@@ -295,12 +301,14 @@ class MazeSolverApp:
             if solver_class:
                 solver = solver_class("generated_maze/m.txt")
                 solver.solve()
-                solver.output_image(
-                    f"generated_maze/{right_algo.lower()}_solution.png")
+                right_filename = f"generated_maze/{right_algo.lower()}_solution.png"
+                directory = os.path.dirname(right_filename)
+                if directory and not os.path.exists(directory):
+                    os.makedirs(directory)
+                solver.output_image(right_filename)
 
                 # Display solution image
-                right_image = Image.open(
-                    f"generated_maze/{right_algo.lower()}_solution.png")
+                right_image = Image.open(right_filename)
                 right_photo = ImageTk.PhotoImage(right_image)
                 self.right_solution_label.config(image=right_photo)
                 self.right_solution_label.image = right_photo
