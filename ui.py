@@ -301,7 +301,11 @@ class MazeSolverApp:
             if solver_class:
                 solver = solver_class("generated_maze/m.txt")
                 solver.solve()
-                right_filename = f"generated_maze/{right_algo.lower()}_solution.png"
+                # Ensure valid filename and directory existence
+                if right_algo == "A*":
+                    right_filename = f"generated_maze/a_star_solution.png"
+                else:
+                    right_filename = f"generated_maze/{right_algo.lower()}_solution.png"
                 directory = os.path.dirname(right_filename)
                 if directory and not os.path.exists(directory):
                     os.makedirs(directory)
