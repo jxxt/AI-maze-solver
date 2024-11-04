@@ -13,7 +13,6 @@ from algorithms.gbfs import MazeSolverGBFS
 from algorithms.astar import MazeSolverAStar
 
 
-
 class MazeGenerator:
     def __init__(self, width, height):
         self.width = width
@@ -207,7 +206,7 @@ class MazeSolverApp:
 
     def generate_maze(self):
         # Create maze generator and generate maze
-        generator = MazeGenerator(21, 21)
+        generator = MazeGenerator(31, 31)
         generator.generate()
 
         # Save maze to file
