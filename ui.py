@@ -206,7 +206,7 @@ class MazeSolverApp:
 
     def generate_maze(self):
         # Create maze generator and generate maze
-        generator = MazeGenerator(31, 31)
+        generator = MazeGenerator(35, 35)
         generator.generate()
 
         # Save maze to file
@@ -219,7 +219,7 @@ class MazeSolverApp:
         # Clear previous drawings
         self.canvas.delete("all")
 
-        cell_size = 20
+        cell_size = 10
         maze_width = len(maze[0]) * cell_size
         maze_height = len(maze) * cell_size
 
@@ -228,6 +228,8 @@ class MazeSolverApp:
 
         x_offset = (canvas_width - maze_width) // 2
         y_offset = (canvas_height - maze_height) // 2
+        
+        y_offset -= 150
 
         for y in range(len(maze)):
             for x in range(len(maze[0])):
@@ -279,18 +281,20 @@ class MazeSolverApp:
             if solver_class:
                 solver = solver_class("generated_maze/m.txt")
                 solver.solve()
-                # Ensure valid filename and directory existence
                 if left_algo == "A*":
                     left_filename = f"generated_maze/a_star_solution.png"
                 else:
-                    left_filename = f"generated_maze/{left_algo.lower()}_solution.png"
+                    left_filename = f"generated_maze/{
+                        left_algo.lower()}_solution.png"
                 directory = os.path.dirname(left_filename)
                 if directory and not os.path.exists(directory):
                     os.makedirs(directory)
                 solver.output_image(left_filename)
 
-                # Display solution image
+                # Display solution image with resizing
                 left_image = Image.open(left_filename)
+                left_image = left_image.resize(
+                    (left_image.width // 2, left_image.height // 2), Image.Resampling.LANCZOS)
                 left_photo = ImageTk.PhotoImage(left_image)
                 self.left_solution_label.config(image=left_photo)
                 self.left_solution_label.image = left_photo
@@ -301,18 +305,20 @@ class MazeSolverApp:
             if solver_class:
                 solver = solver_class("generated_maze/m.txt")
                 solver.solve()
-                # Ensure valid filename and directory existence
                 if right_algo == "A*":
                     right_filename = f"generated_maze/a_star_solution.png"
                 else:
-                    right_filename = f"generated_maze/{right_algo.lower()}_solution.png"
+                    right_filename = f"generated_maze/{
+                        right_algo.lower()}_solution.png"
                 directory = os.path.dirname(right_filename)
                 if directory and not os.path.exists(directory):
                     os.makedirs(directory)
                 solver.output_image(right_filename)
 
-                # Display solution image
+                # Display solution image with resizing
                 right_image = Image.open(right_filename)
+                right_image = right_image.resize(
+                    (right_image.width // 2, right_image.height // 2), Image.Resampling.LANCZOS)
                 right_photo = ImageTk.PhotoImage(right_image)
                 self.right_solution_label.config(image=right_photo)
                 self.right_solution_label.image = right_photo
