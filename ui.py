@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 from tkinter import ttk
 import random
 import time
@@ -9,9 +10,7 @@ from PIL import Image, ImageTk
 from algorithms.dfs import MazeSolverDFS
 from algorithms.bfs import MazeSolverBFS
 from algorithms.ucs import MazeSolverUCS
-from algorithms.gbfs import MazeSolverGBFS
 from algorithms.astar import MazeSolverAStar
-
 
 class MazeGenerator:
     def __init__(self, width, height):
@@ -223,13 +222,16 @@ class MazeSolverApp:
         maze_width = len(maze[0]) * cell_size
         maze_height = len(maze) * cell_size
 
+        # Get the current size of the canvas
         canvas_width = self.canvas.winfo_width() or 800
         canvas_height = self.canvas.winfo_height() or 600
 
+        # Calculate offsets to center the maze
         x_offset = (canvas_width - maze_width) // 2
         y_offset = (canvas_height - maze_height) // 2
-        
-        y_offset -= 150
+
+        # Ensure maze is fully visible
+        y_offset = 50
 
         for y in range(len(maze)):
             for x in range(len(maze[0])):
@@ -275,17 +277,22 @@ class MazeSolverApp:
         left_algo = self.selected_left_algorithm.get()
         right_algo = self.selected_right_algorithm.get()
 
+        left_time = None
+        right_time = None
+
         # Solve and visualize left algorithm
         if left_algo:
             solver_class = self.algorithm_map.get(left_algo)
             if solver_class:
                 solver = solver_class("generated_maze/m.txt")
+                start_time = time.perf_counter()  # Use perf_counter for better resolution
                 solver.solve()
+                left_time = time.perf_counter() - start_time  # Calculate elapsed time
+                left_time_ns = left_time * 1e9  # Convert to nanoseconds
                 if left_algo == "A*":
                     left_filename = f"generated_maze/a_star_solution.png"
                 else:
-                    left_filename = f"generated_maze/{
-                        left_algo.lower()}_solution.png"
+                    left_filename = f"generated_maze/{left_algo.lower()}_solution.png"
                 directory = os.path.dirname(left_filename)
                 if directory and not os.path.exists(directory):
                     os.makedirs(directory)
@@ -304,12 +311,14 @@ class MazeSolverApp:
             solver_class = self.algorithm_map.get(right_algo)
             if solver_class:
                 solver = solver_class("generated_maze/m.txt")
+                start_time = time.perf_counter()  # Use perf_counter for better resolution
                 solver.solve()
+                right_time = time.perf_counter() - start_time  # Calculate elapsed time
+                right_time_ns = right_time * 1e9  # Convert to nanoseconds
                 if right_algo == "A*":
                     right_filename = f"generated_maze/a_star_solution.png"
                 else:
-                    right_filename = f"generated_maze/{
-                        right_algo.lower()}_solution.png"
+                    right_filename = f"generated_maze/{right_algo.lower()}_solution.png"
                 directory = os.path.dirname(right_filename)
                 if directory and not os.path.exists(directory):
                     os.makedirs(directory)
@@ -322,7 +331,47 @@ class MazeSolverApp:
                 right_photo = ImageTk.PhotoImage(right_image)
                 self.right_solution_label.config(image=right_photo)
                 self.right_solution_label.image = right_photo
-                
+
+        # Show timing dialog with results
+        if left_time is not None and right_time is not None:
+            self.show_timing_dialog(left_time_ns, right_time_ns)  # Pass the timings in ns
+
+    def show_timing_dialog(self, left_algo_time, right_algo_time):
+        # Determine the winner
+        if left_algo_time < right_algo_time:
+            winner_text = "Left Algorithm Wins!"
+            winner_color = "green"
+        elif right_algo_time < left_algo_time:
+            winner_text = "Right Algorithm Wins!"
+            winner_color = "blue"
+        else:
+            winner_text = "It's a Tie!"
+            winner_color = "purple"
+
+        # Create the dialog window
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Algorithm Timing Results")
+        dialog.geometry("400x250")
+        dialog.configure(bg="white")
+
+        # Title label
+        title_label = tk.Label(dialog, text="Algorithm Timing Results", font=("Helvetica", 16, "bold"), bg="white", fg="black")
+        title_label.pack(pady=10)
+
+        # Player timing labels
+        player1_label = tk.Label(dialog, text=f"Left Algorithm Time: {left_algo_time:.2f} ns", font=("Helvetica", 12), bg="white", fg="green")
+        player1_label.pack(pady=5)
+
+        player2_label = tk.Label(dialog, text=f"Right Algorithm Time: {right_algo_time:.2f} ns", font=("Helvetica", 12), bg="white", fg="blue")
+        player2_label.pack(pady=5)
+
+        # Winner label
+        winner_label = tk.Label(dialog, text=winner_text, font=("Helvetica", 14, "bold"), bg="white", fg=winner_color)
+        winner_label.pack(pady=15)
+
+        # Close button
+        close_button = tk.Button(dialog, text="Close", command=dialog.destroy, bg="#e74c3c", fg="white", font=("Helvetica", 10, "bold"))
+        close_button.pack(pady=10)
 
 def main():
     root = tk.Tk()
